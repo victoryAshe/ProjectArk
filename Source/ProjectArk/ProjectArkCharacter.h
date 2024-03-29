@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "ProjectArk.h"
 #include "GameFramework/Character.h"
 #include "ProjectArkCharacter.generated.h"
 
@@ -14,6 +14,9 @@ class AProjectArkCharacter : public ACharacter
 public:
 	AProjectArkCharacter();
 
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -23,6 +26,9 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 private:
+	void SetCameraScope(float NewAxisValue); // Set CameraBoom's ArmLength
+
+private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* TopDownCameraComponent;
@@ -30,5 +36,8 @@ private:
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
+
+private:
+	float scopeScale; // The value to be multiplied by the CameraBoom's ArmLegnth
 };
 

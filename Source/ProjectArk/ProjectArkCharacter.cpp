@@ -34,6 +34,7 @@ AProjectArkCharacter::AProjectArkCharacter()
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	scopeScale = 15.0f;
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -45,7 +46,25 @@ AProjectArkCharacter::AProjectArkCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
+
+
 void AProjectArkCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+}
+
+// Called to bind functionality to input
+void AProjectArkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis(TEXT("SetCameraScope"), this, &AProjectArkCharacter::SetCameraScope);
+}
+
+void AProjectArkCharacter::SetCameraScope(float NewAxisValue)
+{
+	PACHECK(CameraBoom != nullptr);
+	if (NewAxisValue == 0) return;
+	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + NewAxisValue * scopeScale, 300, 1400);
+
 }

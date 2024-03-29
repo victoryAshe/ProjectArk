@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "ProjectArk.h"
 #include "GameFramework/GameModeBase.h"
 #include "ProjectArkGameMode.generated.h"
 
