@@ -32,10 +32,17 @@ AProjectArkCharacter::AProjectArkCharacter()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 1400.f;
-	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+	CameraBoom->SetRelativeRotation(FRotator(-50.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	CameraBoom->bInheritYaw = false;
+	CameraBoom->bInheritPitch = false;
+	CameraBoom->bInheritRoll = false;
 	bisZoomed = false;
-	ArmLengthSpeed = 3.0f;
+	ArmLengthSpeed = 15.f;
+	TargetArmLength = 1400.f;
+	ZoomedRotator = FRotator(-40.f, 0.f,0.f);
+	NotZoomedRotator = FRotator(-50.f,0.f,0.f);
+	ArmRotationSpeed = 3.f;
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -52,6 +59,23 @@ AProjectArkCharacter::AProjectArkCharacter()
 void AProjectArkCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+	if (bisZoomed == true)
+	{
+		if (CameraBoom->TargetArmLength > TargetArmLength)
+		{
+			CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength - ArmLengthSpeed, 300, 1400);
+		}
+		CameraBoom->SetRelativeRotation(FMath::RInterpTo(CameraBoom->GetRelativeRotation(), ZoomedRotator, DeltaSeconds, ArmRotationSpeed));
+	}
+	else if (bisZoomed == false)
+	{
+		if (CameraBoom->TargetArmLength < TargetArmLength)
+		{
+			CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + ArmLengthSpeed, 300, 1400);
+		}
+		CameraBoom->SetRelativeRotation(FMath::RInterpTo(CameraBoom->GetRelativeRotation(), NotZoomedRotator, DeltaSeconds, ArmRotationSpeed));
+	}
 }
 
 // Called to bind functionality to input
@@ -66,6 +90,20 @@ void AProjectArkCharacter::SetCameraScope(float NewAxisValue)
 {
 	PACHECK(CameraBoom != nullptr);
 	if (NewAxisValue == 0) return;
-	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + NewAxisValue * ArmLengthSpeed, 300, 1400);
+
+	if (NewAxisValue < 0)
+	{
+		if (bisZoomed == true) return;
+		bisZoomed = true;
+		TargetArmLength = 300.f;
+	}
+	else
+	{
+		if (bisZoomed == false) return;
+		bisZoomed = false;
+		TargetArmLength = 1400.f;
+	}
+	
+	PALOG(Warning, TEXT("CameraBooom's RelativeRotation: %s"), *CameraBoom->GetRelativeRotation().ToString());
 
 }

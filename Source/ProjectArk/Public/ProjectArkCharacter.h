@@ -40,5 +40,9 @@ private:
 private:
 	bool bisZoomed;
 	float ArmLengthSpeed; // The CameraBoom's ArmLegnth Changing Speed
+	float TargetArmLength;
+	FRotator ZoomedRotator;
+	FRotator NotZoomedRotator;
+	float ArmRotationSpeed;
 };
 
