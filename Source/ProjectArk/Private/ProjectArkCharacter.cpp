@@ -31,10 +31,11 @@ AProjectArkCharacter::AProjectArkCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
+	CameraBoom->TargetArmLength = 1400.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
-	scopeScale = 15.0f;
+	bisZoomed = false;
+	ArmLengthSpeed = 3.0f;
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -65,6 +66,6 @@ void AProjectArkCharacter::SetCameraScope(float NewAxisValue)
 {
 	PACHECK(CameraBoom != nullptr);
 	if (NewAxisValue == 0) return;
-	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + NewAxisValue * scopeScale, 300, 1400);
+	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength + NewAxisValue * ArmLengthSpeed, 300, 1400);
 
 }

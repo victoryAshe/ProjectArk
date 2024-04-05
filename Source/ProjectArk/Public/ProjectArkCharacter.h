@@ -38,6 +38,7 @@ private:
 	class USpringArmComponent* CameraBoom;
 
 private:
-	float scopeScale; // The value to be multiplied by the CameraBoom's ArmLegnth
+	bool bisZoomed;
+	float ArmLengthSpeed; // The CameraBoom's ArmLegnth Changing Speed
 };
 
