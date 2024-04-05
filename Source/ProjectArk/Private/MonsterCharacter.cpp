@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MonsterCharacter.h"
+#include "MonsterAIController.h"
+
 
 // Sets default values
 AMonsterCharacter::AMonsterCharacter()
@@ -16,6 +17,12 @@ AMonsterCharacter::AMonsterCharacter()
 	{
 		GetMesh()->SetSkeletalMesh(SK_Mannequin.Object);
 	}
+
+	// 캐릭터 생성자 코드에서 AI구현
+	// PlacedInWorldOrSpawned : 새 MonsterCharacter마다 MonsterAIController 액터 생성
+	// 플레이어가 조종하는 캐릭터를 제외한 모든 캐릭터는 MonsterCharacter 의 지배를 받는다.
+	AIControllerClass = AMonsterAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 // Called when the game starts or when spawned
