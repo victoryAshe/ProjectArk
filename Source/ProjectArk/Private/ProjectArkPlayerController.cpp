@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ProjectArkPlayerController.h"
-#include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -12,41 +11,39 @@ AProjectArkPlayerController::AProjectArkPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
+	Destination = FVector::ZeroVector;
+	MoveCompletedVector = FVector(0.f, 0.f, -1.f);
+	bMoving = false;
+	bInputPressed = false;
 }
 
 void AProjectArkPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	if(bInputPressed)
+	if (bInputPressed)
 	{
-		FollowTime += DeltaTime;
-
-		// Look for the touch location
-		FVector HitLocation = FVector::ZeroVector;
 		FHitResult Hit;
-		if(bIsTouch)
-		{
-			GetHitResultUnderFinger(ETouchIndex::Touch1, ECC_Visibility, true, Hit);
-		}
-		else
-		{
-			GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-		}
-		HitLocation = Hit.Location;
+		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+		Destination = Hit.Location;
+	}
 
-		// Direct the Pawn towards that location
+	if (bMoving)
+	{
 		APawn* const MyPawn = GetPawn();
-		if(MyPawn)
+		if (MyPawn)
 		{
-			FVector WorldDirection = (HitLocation - MyPawn->GetActorLocation()).GetSafeNormal();
+			FVector WorldDirection = (Destination - MyPawn->GetActorLocation()).GetSafeNormal();
 			MyPawn->AddMovementInput(WorldDirection, 1.f, false);
+
+			if (FVector::Distance(WorldDirection, MoveCompletedVector)<0.01f)
+			{
+				Destination = FVector::ZeroVector;
+				bMoving = false;
+			}
 		}
 	}
-	else
-	{
-		FollowTime = 0.f;
-	}
+
 }
 
 void AProjectArkPlayerController::SetupInputComponent()
@@ -56,49 +53,30 @@ void AProjectArkPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AProjectArkPlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AProjectArkPlayerController::OnSetDestinationReleased);
-
-	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AProjectArkPlayerController::OnTouchPressed);
-	InputComponent->BindTouch(EInputEvent::IE_Released, this, &AProjectArkPlayerController::OnTouchReleased);
-
 }
 
 void AProjectArkPlayerController::OnSetDestinationPressed()
 {
 	// We flag that the input is being pressed
 	bInputPressed = true;
+	bMoving = true;
+
+	// Log for the position
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	Destination = Hit.Location;
+	PALOG(Warning, TEXT("Cursor pointed: %s"), *Destination.ToString());
+
+	//spawn cursor particles
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, Destination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+
 	// Just in case the character was moving because of a previous short press we stop it
 	StopMovement();
+	
 }
 
 void AProjectArkPlayerController::OnSetDestinationReleased()
 {
-	// Player is no longer pressing the input
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Destination);
 	bInputPressed = false;
-
-	// If it was a short press
-	if(FollowTime <= ShortPressThreshold)
-	{
-		// We look for the location in the world where the player has pressed the input
-		FVector HitLocation = FVector::ZeroVector;
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-		HitLocation = Hit.Location;
-
-		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
-	}
-}
-
-void AProjectArkPlayerController::OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	bIsTouch = true;
-	OnSetDestinationPressed();
-}
-
-void AProjectArkPlayerController::OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	bIsTouch = false;
-	OnSetDestinationReleased();
 }

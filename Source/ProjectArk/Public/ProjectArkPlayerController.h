@@ -4,6 +4,7 @@
 
 #include "ProjectArk.h"
 #include "Templates/SubclassOf.h"
+#include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "ProjectArkPlayerController.generated.h"
 
@@ -17,10 +18,6 @@ class AProjectArkPlayerController : public APlayerController
 
 public:
 	AProjectArkPlayerController();
-
-	/** Time Threshold to know if it was a short press */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	float ShortPressThreshold;
 
 	/** FX Class that we will spawn when clicking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
@@ -38,13 +35,12 @@ protected:
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
-	void OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location);
-	void OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location);
 
 private:
+	FVector Destination;
 	bool bInputPressed; // Input is bring pressed
-	bool bIsTouch; // Is it a touch device
-	float FollowTime; // For how long it has been pressed
+	bool bMoving;
+	FVector MoveCompletedVector;
 };
 
 
