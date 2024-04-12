@@ -16,6 +16,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void PossessedBy(AController* NewController) override;
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -36,6 +37,25 @@ private:
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
+
+	/*Minimap camera*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	class USceneCaptureComponent2D* SceneCaptureComponent2D;
+	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* MinimapCameraBoom;
+
+	/*Minimap widget*/
+	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> UI_MinimapClass;
+
+	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	class UUserWidget* MinimapWidget;
+
+	/*Minimap: character indicator*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	class UPaperSpriteComponent* IndicatorSpriteComponent;
 
 private:
 	bool bisZoomed;

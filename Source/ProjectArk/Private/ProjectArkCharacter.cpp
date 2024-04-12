@@ -3,6 +3,7 @@
 #include "ProjectArkCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -10,11 +11,25 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "Blueprint/UserWidget.h"
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
 
 AProjectArkCharacter::AProjectArkCharacter()
 {
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
+	MinimapCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("MinimapCameraBoom"));
+	SceneCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent2D"));
+	IndicatorSpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("IndicatorSprite"));
+
+	// Activate ticking in order to update the cursor every frame.
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
@@ -28,7 +43,6 @@ AProjectArkCharacter::AProjectArkCharacter()
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 	// Create a camera boom...
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 1400.f;
@@ -40,20 +54,80 @@ AProjectArkCharacter::AProjectArkCharacter()
 	bisZoomed = false;
 	ArmLengthSpeed = 15.f;
 	TargetArmLength = 1400.f;
-	ZoomedRotator = FRotator(-40.f, 0.f,0.f);
-	NotZoomedRotator = FRotator(-50.f,0.f,0.f);
+	ZoomedRotator = FRotator(-40.f, 0.f, 0.f);
+	NotZoomedRotator = FRotator(-50.f, 0.f, 0.f);
 	ArmRotationSpeed = 3.f;
 
 	// Create a camera...
-	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Activate ticking in order to update the cursor every frame.
-	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.bStartWithTickEnabled = true;
+	// Create a minimap camera boom
+	MinimapCameraBoom->SetupAttachment(RootComponent);
+	MinimapCameraBoom->SetUsingAbsoluteRotation(true);
+	MinimapCameraBoom->TargetArmLength = 1800.f;
+	MinimapCameraBoom->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	MinimapCameraBoom->bDoCollisionTest = false;
+	MinimapCameraBoom->bInheritYaw = false;
+	MinimapCameraBoom->bInheritPitch = false;
+	MinimapCameraBoom->bInheritRoll = false;
+
+	// Create a minimap capture component
+	SceneCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
+	SceneCaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
+	SceneCaptureComponent2D->OrthoWidth = 1024.f;
+	
+
+	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> Minimap_TextureRenderTargetObject
+	(TEXT("/Game/Textures/Minimap_TextureRenderTarget2D.Minimap_TextureRenderTarget2D"));
+	if (Minimap_TextureRenderTargetObject.Succeeded())
+	{
+		SceneCaptureComponent2D->TextureTarget = Minimap_TextureRenderTargetObject.Object;
+	}
+
+	IndicatorSpriteComponent->SetupAttachment(RootComponent);
+	IndicatorSpriteComponent->SetWorldRotation(FRotator::MakeFromEuler(FVector(90.f, 0.f, -90.f)));
+	IndicatorSpriteComponent->SetRelativeLocation(FVector(0.f, 0.f, 800.f));
+	IndicatorSpriteComponent->SetWorldScale3D(FVector(0.5f, 0.5f, 0.5f));
+	static ConstructorHelpers::FObjectFinder<UPaperSprite> SPRITE_INDICATOR(TEXT("/Game/Textures/indicator_Sprite.indicator_Sprite"));
+	if (SPRITE_INDICATOR.Succeeded())
+	{
+		IndicatorSpriteComponent->SetSprite(SPRITE_INDICATOR.Object);
+	}
+	IndicatorSpriteComponent->bVisibleInSceneCaptureOnly = true;
+
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_MINIMAP(TEXT("/Game/UI/WB_Minimap.WB_Minimap_C"));
+	if (UI_MINIMAP.Succeeded())
+	{
+		UI_MinimapClass = UI_MINIMAP.Class;
+	}
+
+
+	
+
+
 }
 
+
+
+
+void AProjectArkCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (IsPlayerControlled())
+	{
+		PACHECK(nullptr != UI_MinimapClass);
+		MinimapWidget = Cast<UUserWidget>(CreateWidget(GetWorld(), UI_MinimapClass));
+		PACHECK(nullptr != MinimapWidget);
+		if (MinimapWidget != nullptr)
+		{
+			MinimapWidget->AddToViewport(10);
+		}
+
+	}
+}
 
 
 void AProjectArkCharacter::Tick(float DeltaSeconds)
