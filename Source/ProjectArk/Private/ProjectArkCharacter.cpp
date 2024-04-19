@@ -25,6 +25,7 @@ AProjectArkCharacter::AProjectArkCharacter()
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	MinimapCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("MinimapCameraBoom"));
 	SceneCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent2D"));
+	SpriteCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SpriteCaptureComponent2D"));
 	IndicatorSpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("IndicatorSprite"));
 
 	// Activate ticking in order to update the cursor every frame.
@@ -65,7 +66,7 @@ AProjectArkCharacter::AProjectArkCharacter()
 	// Create a minimap camera boom
 	MinimapCameraBoom->SetupAttachment(RootComponent);
 	MinimapCameraBoom->SetUsingAbsoluteRotation(true);
-	MinimapCameraBoom->TargetArmLength = 1800.f;
+	MinimapCameraBoom->TargetArmLength = 2400.f;
 	MinimapCameraBoom->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
 	MinimapCameraBoom->bDoCollisionTest = false;
 	MinimapCameraBoom->bInheritYaw = false;
@@ -76,13 +77,27 @@ AProjectArkCharacter::AProjectArkCharacter()
 	SceneCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
 	SceneCaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
 	SceneCaptureComponent2D->OrthoWidth = 1024.f;
+	SceneCaptureComponent2D->CompositeMode = ESceneCaptureCompositeMode::SCCM_Overwrite;
 	
-
 	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> Minimap_TextureRenderTargetObject
 	(TEXT("/Game/Textures/Minimap_TextureRenderTarget2D.Minimap_TextureRenderTarget2D"));
 	if (Minimap_TextureRenderTargetObject.Succeeded())
 	{
 		SceneCaptureComponent2D->TextureTarget = Minimap_TextureRenderTargetObject.Object;
+	}
+
+	
+	// Create a sprite capture component
+	SpriteCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
+	SpriteCaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
+	SpriteCaptureComponent2D->OrthoWidth = 1024.f;
+	SpriteCaptureComponent2D->CompositeMode = ESceneCaptureCompositeMode::SCCM_Overwrite;
+
+	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> Minimap_SpriteRenderTargetObject
+	(TEXT("/Game/Textures/Minimap_SpriteRenderTarget2D.Minimap_SpriteRenderTarget2D"));
+	if (Minimap_SpriteRenderTargetObject.Succeeded())
+	{
+		SpriteCaptureComponent2D->TextureTarget = Minimap_SpriteRenderTargetObject.Object;
 	}
 
 	IndicatorSpriteComponent->SetupAttachment(RootComponent);
@@ -95,17 +110,13 @@ AProjectArkCharacter::AProjectArkCharacter()
 		IndicatorSpriteComponent->SetSprite(SPRITE_INDICATOR.Object);
 	}
 	IndicatorSpriteComponent->bVisibleInSceneCaptureOnly = true;
-
+	IndicatorSpriteComponent->bOnlyOwnerSee = true;
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> UI_MINIMAP(TEXT("/Game/UI/WB_Minimap.WB_Minimap_C"));
 	if (UI_MINIMAP.Succeeded())
 	{
 		UI_MinimapClass = UI_MINIMAP.Class;
 	}
-
-
-	
-
 
 }
 
@@ -119,12 +130,10 @@ void AProjectArkCharacter::PossessedBy(AController* NewController)
 	if (IsPlayerControlled())
 	{
 		PACHECK(nullptr != UI_MinimapClass);
+
 		MinimapWidget = Cast<UUserWidget>(CreateWidget(GetWorld(), UI_MinimapClass));
 		PACHECK(nullptr != MinimapWidget);
-		if (MinimapWidget != nullptr)
-		{
-			MinimapWidget->AddToViewport(10);
-		}
+		MinimapWidget->AddToViewport(10);
 
 	}
 }

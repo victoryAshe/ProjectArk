@@ -38,20 +38,24 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	/*Minimap camera*/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Minimap, meta = (AllowPrivateAccess = "true"))
-	class USceneCaptureComponent2D* SceneCaptureComponent2D;
-	
-
+	/*Minimap capture component*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Minimap, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* MinimapCameraBoom;
 
-	/*Minimap widget*/
+	/*Minimap_Base widget*/
 	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> UI_MinimapClass;
 
+	/*Minimap_Road*/
+	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	class USceneCaptureComponent2D* SceneCaptureComponent2D;
+
 	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
 	class UUserWidget* MinimapWidget;
+
+	/*Minimap_Sprite*/
+	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	class USceneCaptureComponent2D* SpriteCaptureComponent2D;
 
 	/*Minimap: character indicator*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Minimap, meta = (AllowPrivateAccess = "true"))
