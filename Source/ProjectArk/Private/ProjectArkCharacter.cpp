@@ -26,6 +26,7 @@ AProjectArkCharacter::AProjectArkCharacter()
 	MinimapCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("MinimapCameraBoom"));
 	SceneCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent2D"));
 	SpriteCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SpriteCaptureComponent2D"));
+	RoadCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("RoadCaptureComponent2D"));
 	IndicatorSpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("IndicatorSprite"));
 
 	// Activate ticking in order to update the cursor every frame.
@@ -73,20 +74,32 @@ AProjectArkCharacter::AProjectArkCharacter()
 	MinimapCameraBoom->bInheritPitch = false;
 	MinimapCameraBoom->bInheritRoll = false;
 
-	// Create a minimap capture component
+	// Create a minimap line capture component
 	SceneCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
 	SceneCaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
 	SceneCaptureComponent2D->OrthoWidth = 1024.f;
 	SceneCaptureComponent2D->CompositeMode = ESceneCaptureCompositeMode::SCCM_Overwrite;
 	
 	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> Minimap_TextureRenderTargetObject
-	(TEXT("/Game/Textures/Minimap_TextureRenderTarget2D.Minimap_TextureRenderTarget2D"));
+	(TEXT("/Game/ProjectArkContents/Textures/Minimap_TextureRenderTarget2D.Minimap_TextureRenderTarget2D"));
 	if (Minimap_TextureRenderTargetObject.Succeeded())
 	{
 		SceneCaptureComponent2D->TextureTarget = Minimap_TextureRenderTargetObject.Object;
 	}
 
-	
+	// Create a minimap road captrue component
+	RoadCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
+	RoadCaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
+	RoadCaptureComponent2D->OrthoWidth = 1024.f;
+	RoadCaptureComponent2D->CompositeMode = ESceneCaptureCompositeMode::SCCM_Overwrite;
+
+	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> Minimap_RoadRenderTargetObject
+	(TEXT("/Game/ProjectArkContents/Textures/Minimap_RoadRenderTarget2D.Minimap_RoadRenderTarget2D"));
+	if (Minimap_RoadRenderTargetObject.Succeeded())
+	{
+		RoadCaptureComponent2D->TextureTarget = Minimap_RoadRenderTargetObject.Object;
+	}
+
 	// Create a sprite capture component
 	SpriteCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
 	SpriteCaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
@@ -94,7 +107,7 @@ AProjectArkCharacter::AProjectArkCharacter()
 	SpriteCaptureComponent2D->CompositeMode = ESceneCaptureCompositeMode::SCCM_Overwrite;
 
 	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> Minimap_SpriteRenderTargetObject
-	(TEXT("/Game/Textures/Minimap_SpriteRenderTarget2D.Minimap_SpriteRenderTarget2D"));
+	(TEXT("/Game/ProjectArkContents/Textures/Minimap_SpriteRenderTarget2D.Minimap_SpriteRenderTarget2D"));
 	if (Minimap_SpriteRenderTargetObject.Succeeded())
 	{
 		SpriteCaptureComponent2D->TextureTarget = Minimap_SpriteRenderTargetObject.Object;
@@ -104,7 +117,7 @@ AProjectArkCharacter::AProjectArkCharacter()
 	IndicatorSpriteComponent->SetWorldRotation(FRotator::MakeFromEuler(FVector(90.f, 0.f, -90.f)));
 	IndicatorSpriteComponent->SetRelativeLocation(FVector(0.f, 0.f, 800.f));
 	IndicatorSpriteComponent->SetWorldScale3D(FVector(0.5f, 0.5f, 0.5f));
-	static ConstructorHelpers::FObjectFinder<UPaperSprite> SPRITE_INDICATOR(TEXT("/Game/Textures/indicator_Sprite.indicator_Sprite"));
+	static ConstructorHelpers::FObjectFinder<UPaperSprite> SPRITE_INDICATOR(TEXT("/Game/ProjectArkContents/Textures/indicator_Sprite.indicator_Sprite"));
 	if (SPRITE_INDICATOR.Succeeded())
 	{
 		IndicatorSpriteComponent->SetSprite(SPRITE_INDICATOR.Object);
@@ -112,7 +125,7 @@ AProjectArkCharacter::AProjectArkCharacter()
 	IndicatorSpriteComponent->bVisibleInSceneCaptureOnly = true;
 	IndicatorSpriteComponent->bOnlyOwnerSee = true;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> UI_MINIMAP(TEXT("/Game/UI/WB_Minimap.WB_Minimap_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_MINIMAP(TEXT("/Game/ProjectArkContents/UI/WB_Minimap.WB_Minimap_C"));
 	if (UI_MINIMAP.Succeeded())
 	{
 		UI_MinimapClass = UI_MINIMAP.Class;

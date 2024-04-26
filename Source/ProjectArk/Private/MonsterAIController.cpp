@@ -11,13 +11,13 @@ AMonsterAIController::AMonsterAIController()
 {
 	// RepeatInterval = 3.0f;
 
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("/Game/AI/BB_MonsterCharacter.BB_MonsterCharacter"));
+	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("/Game/ProjectArkContents/AI/BB_MonsterCharacter.BB_MonsterCharacter"));
 	if (BBObject.Succeeded()) 
 	{
 		BBAsset = BBObject.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/AI/BT_MonsterCharacter.BT_MonsterCharacter"));
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/ProjectArkContents/AI/BT_MonsterCharacter.BT_MonsterCharacter"));
 	if (BTObject.Succeeded()) 
 	{
 		BTAsset = BTObject.Object;
