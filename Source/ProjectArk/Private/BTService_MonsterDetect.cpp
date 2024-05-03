@@ -25,7 +25,7 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 
 	UWorld* World = ControllingPawn->GetWorld();
 	FVector Center = ControllingPawn->GetActorLocation();
-	float DetectRadius = 250.0f; // 감지 원의 반지름
+	float DetectRadius = 500.0f; // 감지 원의 반지름
 
 	if (nullptr == World) return;
 	TArray<FOverlapResult> OverlapResults;
