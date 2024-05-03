@@ -31,4 +31,9 @@ private:
 
 	UPROPERTY()
 	class UBlackboardData* BBAsset;
+
+public: 
+	static const FName HomePosKey; // 기본위치
+	static const FName PatrolPosKey; // 순찰
+	static const FName TargetKey; 
 };

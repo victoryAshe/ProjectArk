@@ -23,6 +23,9 @@ AMonsterCharacter::AMonsterCharacter()
 	// 플레이어가 조종하는 캐릭터를 제외한 모든 캐릭터는 MonsterCharacter 의 지배를 받는다.
 	AIControllerClass = AMonsterAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	// 몬스터 콜리전 설정
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("MonsterCharacter"));
 }
 
 // Called when the game starts or when spawned

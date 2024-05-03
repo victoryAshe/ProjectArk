@@ -6,6 +6,11 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BlackboardComponent.h"
+
+const FName AMonsterAIController::HomePosKey(TEXT("HomePos"));
+const FName AMonsterAIController::PatrolPosKey(TEXT("PatrolPos"));
+const FName AMonsterAIController::TargetKey(TEXT("Target"));
 
 AMonsterAIController::AMonsterAIController()
 {
@@ -33,9 +38,12 @@ void AMonsterAIController::OnPossess(APawn* InPawn)
 	UBlackboardComponent* BlackboardComp = Blackboard;
 	if (UseBlackboard(BBAsset, BlackboardComp))
 	{
+		// 액터의 위치정보를 HomePosKey에 저장
+		Blackboard->SetValueAsVector(HomePosKey, GetPawn()->GetActorLocation());
+
 		if (!RunBehaviorTree(BTAsset))
 		{
-			// ABLOG(Error, TEXT("AIController coudn't run behavior tree!"));
+			PALOG(Error, TEXT("AIController coudn't run behavior tree!"));
 		}
 	}
 }
