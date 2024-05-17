@@ -25,7 +25,7 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 
 	UWorld* World = ControllingPawn->GetWorld();
 	FVector Center = ControllingPawn->GetActorLocation();
-	float DetectRadius = 500.0f; // 감지 원의 반지름
+	float DetectRadius = 700.0f; // 감지 원의 반지름
 
 	if (nullptr == World) return;
 	TArray<FOverlapResult> OverlapResults;
@@ -64,6 +64,9 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 			}
 		}
 	}
+
+	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AMonsterAIController::TargetKey, nullptr);
+
 	// 감지 안 되면 빨간색으로 표시
 	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
 }
