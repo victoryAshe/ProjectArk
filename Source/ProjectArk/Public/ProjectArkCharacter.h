@@ -49,14 +49,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
 	class UUserWidget* MinimapWidget;
 
-	/*Minimap_road_line*/
-	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
-	class USceneCaptureComponent2D* SceneCaptureComponent2D;
-
-	/*Minimap_road*/
-	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
-	class USceneCaptureComponent2D* RoadCaptureComponent2D;
-
 	/*Minimap_Sprite*/
 	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
 	class USceneCaptureComponent2D* SpriteCaptureComponent2D;

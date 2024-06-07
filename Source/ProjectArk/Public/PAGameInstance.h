@@ -148,4 +148,22 @@ class PROJECTARK_API UPAGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
+public:
+	UPAGameInstance();
+
+	virtual void Init() override;
+	FPAItemData* GetPAItemData(EItemKind eKind, int32 ItemID);
+	
+private:
+	UPROPERTY()
+	class UDataTable* PACookingItemTable;
+	
+	UPROPERTY()
+	class UDataTable* PAConsumableItemTable;
+
+	UPROPERTY()
+	class UDataTable* PAPotionItemTable;
+
+	UPROPERTY()
+	class UDataTable* PACollectableItemTable;
 };

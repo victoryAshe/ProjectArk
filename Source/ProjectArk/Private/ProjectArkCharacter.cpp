@@ -24,9 +24,7 @@ AProjectArkCharacter::AProjectArkCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	MinimapCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("MinimapCameraBoom"));
-	SceneCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent2D"));
 	SpriteCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SpriteCaptureComponent2D"));
-	RoadCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("RoadCaptureComponent2D"));
 	IndicatorSpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("IndicatorSprite"));
 
 	// Activate ticking in order to update the cursor every frame.
@@ -73,32 +71,6 @@ AProjectArkCharacter::AProjectArkCharacter()
 	MinimapCameraBoom->bInheritYaw = false;
 	MinimapCameraBoom->bInheritPitch = false;
 	MinimapCameraBoom->bInheritRoll = false;
-
-	// Create a minimap line capture component
-	SceneCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
-	SceneCaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
-	SceneCaptureComponent2D->OrthoWidth = 1024.f;
-	SceneCaptureComponent2D->CompositeMode = ESceneCaptureCompositeMode::SCCM_Overwrite;
-	
-	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> Minimap_TextureRenderTargetObject
-	(TEXT("/Game/ProjectArkContents/Textures/Minimap_TextureRenderTarget2D.Minimap_TextureRenderTarget2D"));
-	if (Minimap_TextureRenderTargetObject.Succeeded())
-	{
-		SceneCaptureComponent2D->TextureTarget = Minimap_TextureRenderTargetObject.Object;
-	}
-
-	// Create a minimap road captrue component
-	RoadCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
-	RoadCaptureComponent2D->ProjectionType = ECameraProjectionMode::Orthographic;
-	RoadCaptureComponent2D->OrthoWidth = 1024.f;
-	RoadCaptureComponent2D->CompositeMode = ESceneCaptureCompositeMode::SCCM_Overwrite;
-
-	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> Minimap_RoadRenderTargetObject
-	(TEXT("/Game/ProjectArkContents/Textures/Minimap_RoadRenderTarget2D.Minimap_RoadRenderTarget2D"));
-	if (Minimap_RoadRenderTargetObject.Succeeded())
-	{
-		RoadCaptureComponent2D->TextureTarget = Minimap_RoadRenderTargetObject.Object;
-	}
 
 	// Create a sprite capture component
 	SpriteCaptureComponent2D->SetupAttachment(MinimapCameraBoom, USpringArmComponent::SocketName);
