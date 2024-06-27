@@ -7,6 +7,8 @@
 #include "ProjectArkCharacter.h"
 #include "Engine/World.h"
 
+#include "PAItem.h"
+
 AProjectArkPlayerController::AProjectArkPlayerController()
 {
 	bShowMouseCursor = true;
@@ -53,6 +55,8 @@ void AProjectArkPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AProjectArkPlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AProjectArkPlayerController::OnSetDestinationReleased);
+
+	InputComponent->BindAction("SpawnItem", IE_Pressed, this, &AProjectArkPlayerController::OnSpawnItem);
 }
 
 void AProjectArkPlayerController::OnSetDestinationPressed()
@@ -79,4 +83,25 @@ void AProjectArkPlayerController::OnSetDestinationReleased()
 {
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Destination);
 	bInputPressed = false;
+}
+
+void AProjectArkPlayerController::OnSpawnItem()
+{
+	APawn* const MyPawn = GetPawn();
+	if (MyPawn)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			auto NewItem = GetWorld()->SpawnActor<APAItem>(MyPawn->GetActorLocation(), FRotator::ZeroRotator);
+			PACHECK(NewItem != nullptr);
+
+			UBoxComponent* ItemRootComp = Cast<UBoxComponent>(NewItem->GetRootComponent());
+			PACHECK(ItemRootComp != nullptr);
+
+			if (ItemRootComp->IsSimulatingPhysics())
+			{
+				ItemRootComp->AddForce(FVector::UpVector * ItemRootComp->GetMass());
+			}
+		}
+	}
 }

@@ -36,6 +36,8 @@ protected:
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
 
+	void OnSpawnItem(); //temporary
+
 private:
 	FVector Destination;
 	bool bInputPressed; // Input is bring pressed

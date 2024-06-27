@@ -43,23 +43,55 @@ void UPAGameInstance::Init()
 	Super::Init();
 }
 
-
-FPAItemData* UPAGameInstance::GetPAItemData(EItemKind eKind, int32 ItemID)
+FString UPAGameInstance::ChooseItemID(EItemKind eKind)
 {
-	
+	TArray<FName> ItemIDs;
 	switch (eKind)
 	{
 	case EItemKind::IKE_COOKING:
-		return PACookingItemTable->FindRow<FPACookingData>(*FString::FromInt(ItemID), TEXT(""));
+		ItemIDs = PACookingItemTable->GetRowNames();
 		break;
-	case EItemKind::IKE_CONSUMABLE :
-		return PAConsumableItemTable->FindRow<FPAConsumableData>(*FString::FromInt(ItemID), TEXT(""));
+	case EItemKind::IKE_CONSUMABLE:
+		ItemIDs = PAConsumableItemTable->GetRowNames();
 		break;
 	case EItemKind::IKE_POTION:
-		return PAPotionItemTable->FindRow<FPAPotionData>(*FString::FromInt(ItemID), TEXT(""));
+		ItemIDs = PAPotionItemTable->GetRowNames();
 		break;
 	case EItemKind::IKE_COLLECTABLE:
-		return PACollectableItemTable->FindRow<FPACollectableData>(*FString::FromInt(ItemID), TEXT(""));
+		ItemIDs = PACollectableItemTable->GetRowNames();
+		break;
+	default:
+		PALOG(Warning, TEXT("정의되지 않은 EItemKind입니다: %s"), eKind);
+		return "";
+		break;
+	}
+
+	int randomIdx = FMath::RandRange(0, ItemIDs.Num() - 1);
+	return ItemIDs[randomIdx].ToString();
+}
+
+
+FPAItemData* UPAGameInstance::GetPAItemData(EItemKind eKind, FString ItemID)
+{
+	if(ItemID.IsEmpty())
+	{
+		PALOG(Warning, TEXT("유효하지 않은 ItemID입니다."), NULL);
+		return nullptr;
+	}
+
+	switch (eKind)
+	{
+	case EItemKind::IKE_COOKING:
+		return PACookingItemTable->FindRow<FPACookingData>(*ItemID, TEXT(""));
+		break;
+	case EItemKind::IKE_CONSUMABLE :
+		return PAConsumableItemTable->FindRow<FPAConsumableData>(*ItemID, TEXT(""));
+		break;
+	case EItemKind::IKE_POTION:
+		return PAPotionItemTable->FindRow<FPAPotionData>(*ItemID, TEXT(""));
+		break;
+	case EItemKind::IKE_COLLECTABLE:
+		return PACollectableItemTable->FindRow<FPACollectableData>(*ItemID, TEXT(""));
 		break;
 	default:
 		PALOG(Warning, TEXT("정의되지 않은 EItemKind입니다: %s"), eKind);

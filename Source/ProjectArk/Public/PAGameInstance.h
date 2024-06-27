@@ -14,7 +14,9 @@ enum class EItemKind :uint8 {
 	IKE_COOKING UMETA(DisplayName = "요리"),
 	IKE_CONSUMABLE UMETA(DisplayName = "소비"),
 	IKE_POTION UMETA(DisplayName = "물약"),
-	IKE_COLLECTABLE UMETA(DisplayName = "수집품")
+	IKE_COLLECTABLE UMETA(DisplayName = "수집품"),
+	IKE_SHILLING UMETA(DisplayName = "실링"),
+	IKE_NONE UMETA(DisplayName = "None")
 };
 
 UENUM(BlueprintType)
@@ -152,7 +154,7 @@ public:
 	UPAGameInstance();
 
 	virtual void Init() override;
-	FPAItemData* GetPAItemData(EItemKind eKind, int32 ItemID);
+	FPAItemData* GetPAItemData(EItemKind eKind, FString ItemID);
 	
 private:
 	UPROPERTY()
@@ -166,4 +168,7 @@ private:
 
 	UPROPERTY()
 	class UDataTable* PACollectableItemTable;
+
+public:
+	FString ChooseItemID(EItemKind eKind);
 };
