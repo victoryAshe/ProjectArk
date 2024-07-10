@@ -66,7 +66,8 @@ FString UPAGameInstance::ChooseItemID(EItemKind eKind)
 		break;
 	}
 
-	int randomIdx = FMath::RandRange(0, ItemIDs.Num() - 1);
+	int32 randomIdx = FMath::RandRange(0, ItemIDs.Num() - 1);
+	//PALOG(Warning, TEXT("RandomIdx: %d, ItemID: %s"), randomIdx, *ItemIDs[randomIdx].ToString());
 	return ItemIDs[randomIdx].ToString();
 }
 

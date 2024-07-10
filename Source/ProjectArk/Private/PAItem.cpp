@@ -55,14 +55,10 @@ APAItem::APAItem()
 		}
 		FString itemID = PAGameInstance->ChooseItemID(eItemKind);
 		ItemData = PAGameInstance->GetPAItemData(eItemKind, itemID);
-
-		FString MeshPath = "/Game/ProjectArkContents/Items/StaticMeshs/" + itemID;
-		static ConstructorHelpers::FObjectFinder<UStaticMesh> SM_ITEMMESH(*MeshPath);
-		if (SM_ITEMMESH.Succeeded())
-		{
-			Item->SetStaticMesh(SM_ITEMMESH.Object);
-		}
 	}	// 이외는 상인에게서 구입하거나, 처음에 지급된 상태로 처리
+
+	
+	
 
 	/*
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_CHESTOPEN(TEXT("/Game/InfinityBladeGrassLands/Effects/FX_Treasure/Chest/P_TreasureChest_Open_Mesh.P_TreasureChest_Open_Mesh"));
@@ -78,15 +74,24 @@ APAItem::APAItem()
 	Trigger->SetCollisionProfileName(TEXT("Item"));
 	Item->SetCollisionProfileName(TEXT("NoCollision"));
 
+	Trigger->bIgnoreRadialImpulse = true;
+	Trigger->bIgnoreRadialForce = true;
+	Trigger->SetCanEverAffectNavigation(false);
 	Trigger->SetSimulatePhysics(true);
-
+	Trigger->BodyInstance.bLockXRotation = true;
+	Trigger->BodyInstance.bLockYRotation = true;
+	Trigger->BodyInstance.bLockZRotation = true;
+	Trigger->AddImpulse(FVector(FMath::RandRange(5.f,10.f), FMath::RandRange(5.f, 10.f), Trigger->GetMass()), NAME_None, true);
 }
 
 // Called when the game starts or when spawned
 void APAItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (eItemKind !=EItemKind::IKE_SHILLING && eItemKind!=EItemKind::IKE_NONE)
+	{
+	}
 }
 
 void APAItem::PostInitializeComponents()

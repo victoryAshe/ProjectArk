@@ -69,7 +69,7 @@ void AProjectArkPlayerController::OnSetDestinationPressed()
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 	Destination = Hit.Location;
-	PALOG(Warning, TEXT("Cursor pointed: %s"), *Destination.ToString());
+	//PALOG(Warning, TEXT("Cursor pointed: %s"), *Destination.ToString());
 
 	//spawn cursor particles
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, Destination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
@@ -90,18 +90,10 @@ void AProjectArkPlayerController::OnSpawnItem()
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
 	{
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			auto NewItem = GetWorld()->SpawnActor<APAItem>(MyPawn->GetActorLocation(), FRotator::ZeroRotator);
-			PACHECK(NewItem != nullptr);
-
-			UBoxComponent* ItemRootComp = Cast<UBoxComponent>(NewItem->GetRootComponent());
-			PACHECK(ItemRootComp != nullptr);
-
-			if (ItemRootComp->IsSimulatingPhysics())
-			{
-				ItemRootComp->AddForce(FVector::UpVector * ItemRootComp->GetMass());
-			}
+			auto NewItem = GetWorld()->SpawnActor<APAItem>(MyPawn->GetActorLocation(), FRotator(0, FMath::RandRange(0.f, 360.f),0));
+			
 		}
 	}
 }

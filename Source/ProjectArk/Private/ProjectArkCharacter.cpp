@@ -172,6 +172,6 @@ void AProjectArkCharacter::SetCameraScope(float NewAxisValue)
 		TargetArmLength = 1400.f;
 	}
 	
-	PALOG(Warning, TEXT("CameraBooom's RelativeRotation: %s"), *CameraBoom->GetRelativeRotation().ToString());
+	//PALOG(Warning, TEXT("CameraBooom's RelativeRotation: %s"), *CameraBoom->GetRelativeRotation().ToString());
 
 }

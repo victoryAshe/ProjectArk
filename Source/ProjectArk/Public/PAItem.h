@@ -42,6 +42,14 @@ public:
 	
 	struct FPAItemData* ItemData = nullptr;
 
+/*
+private:
+	void OnAssetLoadCompleted();
+
+private:
+	FSoftObjectPath ItemAssetToLoad = FSoftObjectPath(nullptr);
+	TSharedPtr<struct FStreamableHandle> AssetStreamingHandle;
+*/
 	/*
 private:
 	UFUNCTION()

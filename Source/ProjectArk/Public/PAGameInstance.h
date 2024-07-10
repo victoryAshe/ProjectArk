@@ -5,6 +5,7 @@
 #include "ProjectArk.h"
 #include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
+#include "Engine/StreamableManager.h"
 #include "PAGameInstance.generated.h"
 
 #pragma region ItemData
@@ -154,7 +155,7 @@ public:
 	UPAGameInstance();
 
 	virtual void Init() override;
-	FPAItemData* GetPAItemData(EItemKind eKind, FString ItemID);
+	
 	
 private:
 	UPROPERTY()
@@ -170,5 +171,9 @@ private:
 	class UDataTable* PACollectableItemTable;
 
 public:
+	//FStreamableManager Streamablemanager;
+
 	FString ChooseItemID(EItemKind eKind);
+	FPAItemData* GetPAItemData(EItemKind eKind, FString ItemID);
+	
 };
