@@ -62,3 +62,26 @@ void AMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+void AMonsterCharacter::Attack()
+{
+	if (IsAttacking)
+	{
+		PALOG(Warning, TEXT("Already on the attack"))
+	}
+	else
+	{
+		IsAttacking = true;
+		PALOG(Warning, TEXT("Let's start the attack"))
+	}
+}
+
+// void AMonsterCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+void AMonsterCharacter::OnAttackMontageEnded()
+{
+	PACHECK(IsAttacking);
+	// ABCHECK(CurrentCombo > 0);
+	IsAttacking = false;
+	// AttackEndComboState();
+	OnAttackEnd.Broadcast();
+}

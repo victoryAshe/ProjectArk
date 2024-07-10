@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "MonsterCharacter.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
+
 UCLASS()
 class PROJECTARK_API AMonsterCharacter : public ACharacter
 {
@@ -35,4 +37,15 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void Attack();
+	FOnAttackEndDelegate OnAttackEnd;
+
+private:
+
+	UFUNCTION()
+		void OnAttackMontageEnded();
+		// void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+		bool IsAttacking;
 };

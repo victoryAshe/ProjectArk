@@ -8,9 +8,9 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-const FName AMonsterAIController::HomePosKey(TEXT("HomePos"));
-const FName AMonsterAIController::PatrolPosKey(TEXT("PatrolPos"));
-const FName AMonsterAIController::TargetKey(TEXT("Target"));
+const FName AMonsterAIController::HomePosKey(TEXT("HomePos")); // Monster 생성 위치 값 
+const FName AMonsterAIController::PatrolPosKey(TEXT("PatrolPos")); // 순찰할 위치 정보 
+const FName AMonsterAIController::TargetKey(TEXT("Target")); // 플레이어 위치 
 
 AMonsterAIController::AMonsterAIController()
 {
@@ -41,33 +41,13 @@ void AMonsterAIController::OnPossess(APawn* InPawn)
 		// 액터의 위치정보를 HomePosKey에 저장
 		Blackboard->SetValueAsVector(HomePosKey, GetPawn()->GetActorLocation());
 
+		// HomePosKey 출력
+		// FVector LoggedHomePos = Blackboard->GetValueAsVector(HomePosKey);
+		// PALOG(Warning, TEXT("HomePosKey value: %s"), *LoggedHomePos.ToString());
+
 		if (!RunBehaviorTree(BTAsset))
 		{
 			PALOG(Error, TEXT("AIController coudn't run behavior tree!"));
 		}
 	}
 }
-
-/*
-void AMonsterAIController::OnUnPossess()
-{
-	Super::OnUnPossess();
-	GetWorld()->GetTimerManager().ClearTimer(RepeatTimerHandle);
-}
-
-void AMonsterAIController::OnRepeatTimer()
-{
-	auto CurrentPawn = GetPawn();
-	// ABCHECK(nullptr != CurrentPawn);
-
-	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(GetWorld());
-	if (nullptr != NavSystem) return;
-
-	FNavLocation NextLocation;
-	if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 500.0f, NextLocation))
-	{
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, NextLocation.Location);
-		// ABLOG(Warning, TEXT("Next Location : %s"), *NextLocation.Location.ToString());
-	}
-}
-*/
