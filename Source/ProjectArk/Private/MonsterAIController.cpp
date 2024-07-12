@@ -7,6 +7,8 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "MonsterCharacter.h"
+#include "ProjectArkCharacter.h"
 
 const FName AMonsterAIController::HomePosKey(TEXT("HomePos")); // Monster 생성 위치 값 
 const FName AMonsterAIController::PatrolPosKey(TEXT("PatrolPos")); // 순찰할 위치 정보 
@@ -14,7 +16,7 @@ const FName AMonsterAIController::TargetKey(TEXT("Target")); // 플레이어 위치
 
 AMonsterAIController::AMonsterAIController()
 {
-	// RepeatInterval = 3.0f;
+	RepeatInterval = 3.0f;
 
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(TEXT("/Game/ProjectArkContents/AI/BB_MonsterCharacter.BB_MonsterCharacter"));
 	if (BBObject.Succeeded()) 
@@ -32,9 +34,8 @@ AMonsterAIController::AMonsterAIController()
 void AMonsterAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	// GetWorld()->GetTimerManager().SetTimer(RepeatTimerHandle, this, &AMonsterAIController::OnRepeatTimer, RepeatInterval, true);
-
-	// MonsterAIController 가동 시 비헤이비어 트리 애셋과 같은 폴더에 위치한 블랙보드 애셋, 비헤이비어 트리가 함께 동작한다!
+	
+	// MonsterAIController 가동 시 비헤이비어 트리 애셋과 같은 폴더에 위치한 블랙보드 애셋, 비헤이비어 트리가ㅋ 함께 동작한다!
 	UBlackboardComponent* BlackboardComp = Blackboard;
 	if (UseBlackboard(BBAsset, BlackboardComp))
 	{
@@ -49,5 +50,34 @@ void AMonsterAIController::OnPossess(APawn* InPawn)
 		{
 			PALOG(Error, TEXT("AIController coudn't run behavior tree!"));
 		}
+
+		// 3초 간격으로 거리 체크 
+		GetWorld()->GetTimerManager().SetTimer(RepeatTimerHandle, this, &AMonsterAIController::OnRepeatTimer, RepeatInterval, true);
+
 	}
+}
+
+void AMonsterAIController::OnRepeatTimer()
+{
+	PrintDistanceToTarget();
+}
+
+void AMonsterAIController::PrintDistanceToTarget()
+{
+	auto ControllingPawn = GetPawn();
+	if (nullptr == ControllingPawn)
+	{
+		PALOG(Error, TEXT("ControllingPawn is null"));
+		return;
+	}
+
+	auto Target = Cast<AProjectArkCharacter>(Blackboard->GetValueAsObject(TargetKey));
+	if (nullptr == Target)
+	{
+		PALOG(Error, TEXT("Target is null"));
+		return;
+	}
+
+	float Distance = Target->GetDistanceTo(ControllingPawn);
+	PALOG(Warning, TEXT("Target distance: %s"), *FString::SanitizeFloat(Distance));
 }

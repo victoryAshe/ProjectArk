@@ -67,12 +67,13 @@ void AMonsterCharacter::Attack()
 {
 	if (IsAttacking)
 	{
-		PALOG(Warning, TEXT("Already on the attack"))
+		PALOG(Warning, TEXT("Already on the attack"));
 	}
 	else
 	{
 		IsAttacking = true;
-		PALOG(Warning, TEXT("Let's start the attack"))
+		PALOG(Warning, TEXT("Let's start the attack"));
+		OnAttackMontageEnded(); // 임시 실행 
 	}
 }
 
@@ -84,4 +85,5 @@ void AMonsterCharacter::OnAttackMontageEnded()
 	IsAttacking = false;
 	// AttackEndComboState();
 	OnAttackEnd.Broadcast();
+	PALOG(Warning, TEXT("OnAttackMontageEnded()"));
 }

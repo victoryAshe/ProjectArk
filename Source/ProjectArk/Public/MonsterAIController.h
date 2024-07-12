@@ -19,12 +19,13 @@ public:
 	AMonsterAIController();
 	virtual void OnPossess(APawn* InPawn) override;
 	// virtual void OnUnPossess() override;
+	void PrintDistanceToTarget();
 
 private:
-	// void OnRepeatTimer();
+	void OnRepeatTimer();
 
-	// FTimerHandle RepeatTimerHandle;
-	// float RepeatInterval;
+	FTimerHandle RepeatTimerHandle;
+	float RepeatInterval;
 
 	UPROPERTY()
 	class UBehaviorTree* BTAsset;

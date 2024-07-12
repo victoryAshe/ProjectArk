@@ -21,7 +21,7 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (nullptr == ControllingPawn) 
 	{
-		// PALOG(Error, TEXT("ControllingPawn is null"));
+		PALOG(Error, TEXT("ControllingPawn is null"));
 		return false;
 	}
 
@@ -29,17 +29,12 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 	auto Target = Cast<AProjectArkCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AMonsterAIController::TargetKey));
 	if (nullptr == Target) 
 	{
-		// PALOG(Error, TEXT("Target is null"));
+		PALOG(Error, TEXT("Target is null"));
 		return false;
 	}
 
 	// Target과 ControllingPawn 사이의 거리가 200 이하인지 확인
 	bResult = (Target->GetDistanceTo(ControllingPawn) <= 200.0f);
-
-	if (! bResult)
-	{
-		// PALOG(Error, TEXT("Target is so far"));
-	}
-
+		
 	return bResult;
 }
