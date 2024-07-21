@@ -23,6 +23,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UNiagaraSystem* FXCursor;
 
+	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void OnCallInventory();
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -38,11 +42,23 @@ protected:
 
 	void OnSpawnItem(); //temporary
 
+
+
 private:
 	FVector Destination;
 	bool bInputPressed; // Input is bring pressed
 	bool bMoving;
 	FVector MoveCompletedVector;
+
+
+	/*Inventory widget*/
+	bool bInventoryOpened;
+
+	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> UI_InventoryClass;
+
+	UPROPERTY(VisibleAnywhere, Category = Minimap, meta = (AllowPrivateAccess = "true"))
+	class UUserWidget* InventoryWidget;
 };
 
 

@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "PAItem.h"
 #include "ProjectArkCharacter.h"
 #include "PAGameInstance.h"
+#include "PAItemSetting.h"
 
 // Sets default values
 APAItem::APAItem()
@@ -22,19 +23,16 @@ APAItem::APAItem()
 
 	Trigger->SetBoxExtent(FVector(40.0f, 42.0f, 30.0f));
 
-	auto PAGameInstance = Cast<UPAGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	PACHECK(nullptr != PAGameInstance);
-
 	int determindKind = FMath::RandRange(0, 100);
-	//TODO: È®·ü¿¡ µû¶ó eKind Á¤ÇÏ±â
+	//TODO: í™•ë¥ ì— ë”°ë¼ eKind ì •í•˜ê¸°
 	if (determindKind <= 40) {
 		eItemKind = EItemKind::IKE_NONE;
 		amount = 0;
 		return;
-	}//None: ¾Æ¹«°Íµµ ½ºÆù ¾ÈÇÔ
+	}//None: ì•„ë¬´ê²ƒë„ ìŠ¤í° ì•ˆí•¨
 	else if (determindKind <= 80)
 	{
-		//½Ç¸µ
+		//ì‹¤ë§
 		eItemKind = EItemKind::IKE_SHILLING;
 		static ConstructorHelpers::FObjectFinder<UStaticMesh> SM_SHILLINGS(TEXT("/Game/ProjectArkContents/Items/StaticMeshs/Shillings"));
 		if (SM_SHILLINGS.Succeeded())
@@ -43,22 +41,15 @@ APAItem::APAItem()
 		}
 		amount = FMath::RandRange(10, 100);
 	}
-	else
+	else if (determindKind <= 95)// ë¬¼ì•½
 	{
-		if (determindKind <= 95)// ¹°¾à
-		{
-			eItemKind = EItemKind::IKE_POTION;
-		}
-		else // ¼öÁıÇ°
-		{
-			eItemKind = EItemKind::IKE_COLLECTABLE;
-		}
-		FString itemID = PAGameInstance->ChooseItemID(eItemKind);
-		ItemData = PAGameInstance->GetPAItemData(eItemKind, itemID);
-	}	// ÀÌ¿Ü´Â »óÀÎ¿¡°Ô¼­ ±¸ÀÔÇÏ°Å³ª, Ã³À½¿¡ Áö±ŞµÈ »óÅÂ·Î Ã³¸®
+		eItemKind = EItemKind::IKE_POTION;
+	}
+	else // ìˆ˜ì§‘í’ˆ
+	{
+		eItemKind = EItemKind::IKE_COLLECTABLE;
+	}// ì´ì™¸ ItemKindëŠ” ìƒì¸ì—ê²Œì„œ êµ¬ì…í•˜ê±°ë‚˜, ì²˜ìŒì— ì§€ê¸‰ëœ ìƒíƒœë¡œ ì²˜ë¦¬(ìŠ¤í° X)
 
-	
-	
 
 	/*
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_CHESTOPEN(TEXT("/Game/InfinityBladeGrassLands/Effects/FX_Treasure/Chest/P_TreasureChest_Open_Mesh.P_TreasureChest_Open_Mesh"));
@@ -81,16 +72,43 @@ APAItem::APAItem()
 	Trigger->BodyInstance.bLockXRotation = true;
 	Trigger->BodyInstance.bLockYRotation = true;
 	Trigger->BodyInstance.bLockZRotation = true;
-	Trigger->AddImpulse(FVector(FMath::RandRange(5.f,10.f), FMath::RandRange(5.f, 10.f), Trigger->GetMass()), NAME_None, true);
 }
 
 // Called when the game starts or when spawned
 void APAItem::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (eItemKind !=EItemKind::IKE_SHILLING && eItemKind!=EItemKind::IKE_NONE)
 	{
+		if (eItemKind == EItemKind::IKE_POTION || eItemKind == EItemKind::IKE_COLLECTABLE)
+		{
+			auto PAGameInstance = Cast<UPAGameInstance>(GetGameInstance());
+			PACHECK(nullptr != PAGameInstance);
+
+			TPair<FString, int32> ChoosedID = PAGameInstance->ChooseItemID(eItemKind);
+			
+			auto DefaultSetting = GetDefault<UPAItemSetting>();
+			if (eItemKind == EItemKind::IKE_POTION)
+			{
+				ItemAssetToLoad = DefaultSetting->PotionAssets[ChoosedID.Value];
+			}
+			else // collectable
+			{
+				ItemAssetToLoad = DefaultSetting->CollectableAssets[ChoosedID.Value];
+			}
+
+			
+			AssetStreamingHandle = PAGameInstance->Streamablemanager.RequestAsyncLoad(ItemAssetToLoad, 
+				FStreamableDelegate::CreateUObject(this, &APAItem::OnAssetLoadCompleted));
+			
+			ItemData = PAGameInstance->GetPAItemData(eItemKind, ChoosedID.Key);
+		}
+	}
+
+	if (eItemKind != EItemKind::IKE_NONE)
+	{
+		Trigger->AddImpulse(FVector(FMath::RandRange(5.f, 10.f), FMath::RandRange(5.f, 10.f), Trigger->GetMass()), NAME_None, true);
 	}
 }
 
@@ -107,6 +125,17 @@ void APAItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APAItem::OnAssetLoadCompleted()
+{
+	UStaticMesh* AssetLoaded = Cast<UStaticMesh>(AssetStreamingHandle->GetLoadedAsset());
+	AssetStreamingHandle.Reset();
+	if (nullptr != AssetLoaded)
+	{
+		Item->SetStaticMesh(AssetLoaded);
+	}
+	else { PALOG(Warning, TEXT("StaticMesh is not loaded!: %s"), *ItemAssetToLoad.ToString()); }
 }
 
 

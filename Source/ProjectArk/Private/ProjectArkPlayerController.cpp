@@ -6,7 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "ProjectArkCharacter.h"
 #include "Engine/World.h"
-
+#include "Blueprint/UserWidget.h"
 #include "PAItem.h"
 
 AProjectArkPlayerController::AProjectArkPlayerController()
@@ -17,6 +17,19 @@ AProjectArkPlayerController::AProjectArkPlayerController()
 	MoveCompletedVector = FVector(0.f, 0.f, -1.f);
 	bMoving = false;
 	bInputPressed = false;
+
+	bInventoryOpened = false;
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_INVENTORY(TEXT("/Game/ProjectArkContents/UI/WB_Inventory.WB_Inventory_C"));
+	if (UI_INVENTORY.Succeeded())
+	{
+		UI_InventoryClass = UI_INVENTORY.Class;
+	}
+
+	PACHECK(nullptr != UI_InventoryClass);
+
+	InventoryWidget = Cast<UUserWidget>(CreateWidget(GetWorld(), UI_InventoryClass));
+
+
 }
 
 void AProjectArkPlayerController::PlayerTick(float DeltaTime)
@@ -57,6 +70,8 @@ void AProjectArkPlayerController::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AProjectArkPlayerController::OnSetDestinationReleased);
 
 	InputComponent->BindAction("SpawnItem", IE_Pressed, this, &AProjectArkPlayerController::OnSpawnItem);
+
+	InputComponent->BindAction("CallInventory", IE_Pressed, this, &AProjectArkPlayerController::OnCallInventory);
 }
 
 void AProjectArkPlayerController::OnSetDestinationPressed()
@@ -90,10 +105,26 @@ void AProjectArkPlayerController::OnSpawnItem()
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
 	{
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 1; i++)
 		{
 			auto NewItem = GetWorld()->SpawnActor<APAItem>(MyPawn->GetActorLocation(), FRotator(0, FMath::RandRange(0.f, 360.f),0));
 			
 		}
+	}
+}
+
+void AProjectArkPlayerController::OnCallInventory()
+{
+	PACHECK(nullptr != InventoryWidget);
+	if (bInventoryOpened==true)
+	{
+		InventoryWidget->RemoveFromViewport();
+		bInventoryOpened = false;
+		
+	}
+	else
+	{
+		InventoryWidget->AddToViewport(11);
+		bInventoryOpened = true;
 	}
 }

@@ -31,7 +31,8 @@ enum class EItemGrade : uint8 {
 UENUM(BlueprintType)
 enum class EBoundState : uint8 {
 	BSE_CHARACTER UMETA(DisplayName = "캐릭터"),
-	BSE_ROSTER UMETA(DisplayName = "원정대")
+	BSE_ROSTER UMETA(DisplayName = "원정대"),
+	BSE_NONE UMETA(DisplayName = "없음")
 };
 
 USTRUCT(BlueprintType)
@@ -40,7 +41,11 @@ struct FPAItemData : public FTableRowBase
 	GENERATED_BODY()
 	
 public:
-	FPAItemData() {};
+	FPAItemData(): itemID(0), itemName(TEXT("")),eKind(EItemKind::IKE_NONE),
+	eGrade(EItemGrade::IGE_NORMAL), eBoundState(EBoundState::BSE_CHARACTER)
+	, description(TEXT("")),bCanbeSold(true), bCanbeDestroyed(true),
+	bCanbeDismantled(true),sources(TArray<FString>()), buyPrice(0), sellPrice(0)
+	, count(0){};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 itemID;
@@ -77,6 +82,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	int sellPrice;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int count;
 
 };
 
@@ -139,7 +147,9 @@ struct FPACollectableData : public FPAItemData {
 	GENERATED_BODY()
 	
 public:
-	FPACollectableData() {};
+	FPACollectableData() {
+		bCanbeDismantled = false;
+	};
 };
 #pragma endregion
 
@@ -171,9 +181,9 @@ private:
 	class UDataTable* PACollectableItemTable;
 
 public:
-	//FStreamableManager Streamablemanager;
+	FStreamableManager Streamablemanager;
 
-	FString ChooseItemID(EItemKind eKind);
+	TPair<FString, int32>  ChooseItemID(EItemKind eKind);
 	FPAItemData* GetPAItemData(EItemKind eKind, FString ItemID);
 	
 };

@@ -9,6 +9,6 @@ public class ProjectArkEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.Add("ProjectArk");
+		ExtraModuleNames.AddRange(new string[] { "ProjectArk", "ProjectArkSetting" });
 	}
 }

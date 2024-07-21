@@ -42,14 +42,15 @@ public:
 	
 	struct FPAItemData* ItemData = nullptr;
 
-/*
+
+	//Item StaticMesh 지연로드
 private:
 	void OnAssetLoadCompleted();
 
 private:
 	FSoftObjectPath ItemAssetToLoad = FSoftObjectPath(nullptr);
 	TSharedPtr<struct FStreamableHandle> AssetStreamingHandle;
-*/
+
 	/*
 private:
 	UFUNCTION()

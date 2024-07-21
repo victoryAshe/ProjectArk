@@ -9,6 +9,6 @@ public class ProjectArkTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.Add("ProjectArk");
+		ExtraModuleNames.AddRange(new string[] { "ProjectArk", "ProjectArkSetting" });
 	}
 }

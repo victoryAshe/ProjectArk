@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PAGameInstance.h"
 
@@ -43,7 +43,7 @@ void UPAGameInstance::Init()
 	Super::Init();
 }
 
-FString UPAGameInstance::ChooseItemID(EItemKind eKind)
+TPair<FString, int32> UPAGameInstance::ChooseItemID(EItemKind eKind)
 {
 	TArray<FName> ItemIDs;
 	switch (eKind)
@@ -61,14 +61,13 @@ FString UPAGameInstance::ChooseItemID(EItemKind eKind)
 		ItemIDs = PACollectableItemTable->GetRowNames();
 		break;
 	default:
-		PALOG(Warning, TEXT("Á¤ÀÇµÇÁö ¾ÊÀº EItemKindÀÔ´Ï´Ù: %s"), eKind);
-		return "";
+		PALOG(Warning, TEXT("ì •ì˜ë˜ì§€ ì•Šì€ EItemKindì…ë‹ˆë‹¤: %s"), eKind);
+		return {TEXT(""), -1};
 		break;
 	}
 
 	int32 randomIdx = FMath::RandRange(0, ItemIDs.Num() - 1);
-	//PALOG(Warning, TEXT("RandomIdx: %d, ItemID: %s"), randomIdx, *ItemIDs[randomIdx].ToString());
-	return ItemIDs[randomIdx].ToString();
+	return {ItemIDs[randomIdx].ToString(), randomIdx};
 }
 
 
@@ -76,7 +75,7 @@ FPAItemData* UPAGameInstance::GetPAItemData(EItemKind eKind, FString ItemID)
 {
 	if(ItemID.IsEmpty())
 	{
-		PALOG(Warning, TEXT("À¯È¿ÇÏÁö ¾ÊÀº ItemIDÀÔ´Ï´Ù."), NULL);
+		PALOG(Warning, TEXT("ìœ íš¨í•˜ì§€ ì•Šì€ ItemIDì…ë‹ˆë‹¤."), NULL);
 		return nullptr;
 	}
 
@@ -95,7 +94,7 @@ FPAItemData* UPAGameInstance::GetPAItemData(EItemKind eKind, FString ItemID)
 		return PACollectableItemTable->FindRow<FPACollectableData>(*ItemID, TEXT(""));
 		break;
 	default:
-		PALOG(Warning, TEXT("Á¤ÀÇµÇÁö ¾ÊÀº EItemKindÀÔ´Ï´Ù: %s"), eKind);
+		PALOG(Warning, TEXT("ì •ì˜ë˜ì§€ ì•Šì€ EItemKindì…ë‹ˆë‹¤: %s"), eKind);
 		return nullptr;
 		break;
 	}
