@@ -85,5 +85,5 @@ void AMonsterCharacter::OnAttackMontageEnded()
 	IsAttacking = false;
 	// AttackEndComboState();
 	OnAttackEnd.Broadcast();
-	PALOG(Warning, TEXT("OnAttackMontageEnded()"));
+	PALOG(Log, TEXT("OnAttackMontageEnded()"));
 }

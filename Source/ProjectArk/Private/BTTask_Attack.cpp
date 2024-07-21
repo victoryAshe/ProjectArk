@@ -41,5 +41,4 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		PALOG(Warning, TEXT("Attack Finish"));
 	}
-	
 }

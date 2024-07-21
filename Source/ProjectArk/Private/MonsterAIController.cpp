@@ -10,9 +10,10 @@
 #include "MonsterCharacter.h"
 #include "ProjectArkCharacter.h"
 
-const FName AMonsterAIController::HomePosKey(TEXT("HomePos")); // Monster 생성 위치 값 
-const FName AMonsterAIController::PatrolPosKey(TEXT("PatrolPos")); // 순찰할 위치 정보 
-const FName AMonsterAIController::TargetKey(TEXT("Target")); // 플레이어 위치 
+const FName AMonsterAIController::HomePosKey(TEXT("HomePos"));                      // Monster 생성 위치 값 
+const FName AMonsterAIController::PatrolPosKey(TEXT("PatrolPos"));                  // 순찰할 위치 정보 
+const FName AMonsterAIController::TargetKey(TEXT("Target"));                        // 플레이어 위치 
+const FName AMonsterAIController::ShouldReturnHomeKey(TEXT("bShouldReturnHome"));   // 기존 위치로 돌아가?
 
 AMonsterAIController::AMonsterAIController()
 {
@@ -74,10 +75,10 @@ void AMonsterAIController::PrintDistanceToTarget()
 	auto Target = Cast<AProjectArkCharacter>(Blackboard->GetValueAsObject(TargetKey));
 	if (nullptr == Target)
 	{
-		PALOG(Error, TEXT("Target is null"));
+		PALOG(Warning, TEXT("Target is null"));
 		return;
 	}
 
 	float Distance = Target->GetDistanceTo(ControllingPawn);
-	PALOG(Warning, TEXT("Target distance: %s"), *FString::SanitizeFloat(Distance));
+	PALOG(Log, TEXT("Target distance: %s"), *FString::SanitizeFloat(Distance));
 }
