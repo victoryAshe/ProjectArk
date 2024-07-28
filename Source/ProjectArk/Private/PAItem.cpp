@@ -5,6 +5,8 @@
 #include "ProjectArkCharacter.h"
 #include "PAGameInstance.h"
 #include "PAItemSetting.h"
+#include "Components/WidgetComponent.h"
+#include "UW_ItemName.h"
 
 // Sets default values
 APAItem::APAItem()
@@ -13,13 +15,14 @@ APAItem::APAItem()
 	PrimaryActorTick.bCanEverTick = false;
 
 	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("TRIGGER"));
-	Item = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Item"));
+	Item = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ITEM"));
 	Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("EFFECT"));
+	ItemNameWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("ITEMNAMEWIDGET"));
 
 	RootComponent = Trigger;
 	Item->SetupAttachment(RootComponent);
 	Effect->SetupAttachment(RootComponent);
-
+	ItemNameWidget->SetupAttachment(RootComponent);
 
 	Trigger->SetBoxExtent(FVector(40.0f, 42.0f, 30.0f));
 
@@ -59,6 +62,15 @@ APAItem::APAItem()
 		Effect->bAutoActivate = false;
 	}
 	*/
+
+	ItemNameWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	ItemNameWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_ITEMNAME(TEXT("/Game/ProjectArkContents/UI/WB_ItemName.WB_ItemName_C"));
+	if (UI_ITEMNAME.Succeeded())
+	{
+		ItemNameWidget->SetWidgetClass(UI_ITEMNAME.Class);
+		ItemNameWidget->SetDrawSize(FVector2D(120.0f, 50.0f));
+	}
 
 	Item->SetRelativeLocation(FVector(0.0f, -3.5f, -30.0f));
 
@@ -109,6 +121,20 @@ void APAItem::BeginPlay()
 	if (eItemKind != EItemKind::IKE_NONE)
 	{
 		Trigger->AddImpulse(FVector(FMath::RandRange(5.f, 10.f), FMath::RandRange(5.f, 10.f), Trigger->GetMass()), NAME_None, true);
+
+		auto NameWidget = Cast<UUW_ItemName>(ItemNameWidget->GetUserWidgetObject());
+		if (nullptr != NameWidget)
+		{
+			if (eItemKind == EItemKind::IKE_SHILLING)
+			{
+				std::string ShillingName = "실링";
+				NameWidget->SetItemName(UTF8_TO_TCHAR(ShillingName.c_str()));
+			}
+			else
+			{
+				NameWidget->SetItemName(ItemData->itemName);
+			}
+		}
 	}
 }
 
@@ -117,6 +143,13 @@ void APAItem::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	//Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnCharacterOverlap);
+}
+
+void APAItem::OnPlayerOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+
 }
 
 

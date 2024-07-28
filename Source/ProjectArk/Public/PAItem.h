@@ -36,6 +36,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Item)
 	int amount = 1;
 
+	UPROPERTY(VisibleAnywhere, Category = UI)
+	class UWidgetComponent* ItemNameWidget;
 	
 	UPROPERTY(VisibleAnywhere, Category = Effect)
 	UParticleSystemComponent* Effect;
@@ -51,12 +53,12 @@ private:
 	FSoftObjectPath ItemAssetToLoad = FSoftObjectPath(nullptr);
 	TSharedPtr<struct FStreamableHandle> AssetStreamingHandle;
 
-	/*
+	
 private:
 	UFUNCTION()
-	void OnCharacterOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	void OnPlayerOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 			int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	/*
 	UFUNCTION()
 	void OnEffectFinished(class UParticleSystemComponent* PSystem);
 	*/
