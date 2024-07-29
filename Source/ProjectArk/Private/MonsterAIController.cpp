@@ -8,7 +8,7 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "MonsterCharacter.h"
-#include "ProjectArkCharacter.h"
+#include "PACharacter.h"
 
 const FName AMonsterAIController::HomePosKey(TEXT("HomePos"));                      // Monster 생성 위치 값 
 const FName AMonsterAIController::PatrolPosKey(TEXT("PatrolPos"));                  // 순찰할 위치 정보 
@@ -72,7 +72,7 @@ void AMonsterAIController::PrintDistanceToTarget()
 		return;
 	}
 
-	auto Target = Cast<AProjectArkCharacter>(Blackboard->GetValueAsObject(TargetKey));
+	auto Target = Cast<APACharacter>(Blackboard->GetValueAsObject(TargetKey));
 	if (nullptr == Target)
 	{
 		PALOG(Warning, TEXT("Target is null"));

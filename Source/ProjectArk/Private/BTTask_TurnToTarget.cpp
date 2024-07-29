@@ -3,7 +3,7 @@
 #include "BTTask_TurnToTarget.h"
 #include "MonsterAIController.h"
 #include "MonsterCharacter.h"
-#include "ProjectArkCharacter.h"
+#include "PACharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_TurnToTarget::UBTTask_TurnToTarget()
@@ -19,7 +19,7 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	if (nullptr == MonsterCharacter)
 		return EBTNodeResult::Failed;
 
-	auto Target = Cast<AProjectArkCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AMonsterAIController::TargetKey));
+	auto Target = Cast<APACharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AMonsterAIController::TargetKey));
 	if (nullptr == Target)
 		return EBTNodeResult::Failed;
 

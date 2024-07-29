@@ -4,7 +4,7 @@
 #include "BTDecorator_IsInAttackRange.h"
 #include "MonsterAIController.h"
 #include "MonsterCharacter.h"
-#include "ProjectArkCharacter.h"
+#include "PACharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTDecorator_IsInAttackRange::UBTDecorator_IsInAttackRange()
@@ -25,8 +25,8 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 		return false;
 	}
 
-	// 블랙보드에서 TargetKey에 해당하는 값을 가져와 AProjectArkCharacter로 캐스팅
-	auto Target = Cast<AProjectArkCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AMonsterAIController::TargetKey));
+	// 블랙보드에서 TargetKey에 해당하는 값을 가져와 APACharacter로 캐스팅
+	auto Target = Cast<APACharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AMonsterAIController::TargetKey));
 	if (nullptr == Target) 
 	{
 		PALOG(Error, TEXT("Target is null"));

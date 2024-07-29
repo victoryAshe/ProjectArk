@@ -4,7 +4,7 @@
 #include "BTService_MonsterDetect.h"
 #include "MonsterAIController.h"
 #include "MonsterCharacter.h"
-#include "ProjectArkCharacter.h"
+#include "PACharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
 
@@ -68,7 +68,7 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 		for (auto const& OverlapResult : OverlapResults)
 		{
 			// 충돌체의 액터 가져오기 : 해당 액터가 플레이어 캐릭터라면 ProjectArkCharacter 변수에 할당, 아니라면 nullptr
-			AProjectArkCharacter* ProjectArkCharacter = Cast<AProjectArkCharacter>(OverlapResult.GetActor());
+			APACharacter* ProjectArkCharacter = Cast<APACharacter>(OverlapResult.GetActor());
 
 			// ProjectArkCharacter가 참 && 플레이어를 제어하는 컨트롤러인지 확인
 			if (ProjectArkCharacter && ProjectArkCharacter->GetController()->IsPlayerController())
