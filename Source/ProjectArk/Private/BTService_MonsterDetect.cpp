@@ -34,17 +34,24 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	// HomePos에서의 거리 계산
 	FVector HomePos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(AMonsterAIController::HomePosKey);
 	float DistanceFromHome = FVector::Dist(Center, HomePos);
+	PALOG(Warning, TEXT("Distance from Home: %f"), DistanceFromHome);
 
 	if (DistanceFromHome > 2000.0f)
 	{
+		PALOG(Error, TEXT("DistanceFromHome > 2000.0f"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), true);
+		PALOG(Error, TEXT("bShouldReturnHome is true"));
 		return;
 	}
+	/*
 	else if (DistanceFromHome < 1.0f)
 	{
+		PALOG(Error, TEXT("DistanceFromHome < 1.0f"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), false);
+		PALOG(Error, TEXT("bShouldReturnHome is false"));
 	}
-	
+	*/
+
 	// 주변 충돌체 검출 
 	bool bResult = World->OverlapMultiByChannel(
 		OverlapResults,                             // 탐색된 모든 객체를 담는 TArray
@@ -56,6 +63,7 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	);
 
 	
+	// TargetKey 값 초기화
 	// 검색 전 타겟은 초기화를 해줘야 없어졌을때 패트롤 모드로 간다. 아직도 복수의 타겟 처리가 안되었다.
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AMonsterAIController::TargetKey, nullptr);
 
