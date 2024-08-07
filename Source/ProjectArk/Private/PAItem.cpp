@@ -3,6 +3,7 @@
 
 #include "PAItem.h"
 #include "PACharacter.h"
+#include "PAPlayerController.h"
 #include "PAGameInstance.h"
 #include "PAItemSetting.h"
 #include "Components/WidgetComponent.h"
@@ -63,7 +64,7 @@ APAItem::APAItem()
 	}
 	*/
 
-	ItemNameWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	ItemNameWidget->SetRelativeLocation(FVector::Zero());
 	ItemNameWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	static ConstructorHelpers::FClassFinder<UUserWidget> UI_ITEMNAME(TEXT("/Game/ProjectArkContents/UI/WB_ItemName.WB_ItemName_C"));
 	if (UI_ITEMNAME.Succeeded())
@@ -72,18 +73,18 @@ APAItem::APAItem()
 		ItemNameWidget->SetDrawSize(FVector2D(120.0f, 50.0f));
 	}
 
-	Item->SetRelativeLocation(FVector(0.0f, -3.5f, -30.0f));
+	Item->SetRelativeLocation(FVector(0.0f, 0.0f, -30.0f));
 
-	Trigger->SetCollisionProfileName(TEXT("Item"));
-	Item->SetCollisionProfileName(TEXT("NoCollision"));
+	Trigger->SetCollisionProfileName(TEXT("ItemTrigger"));
+	Item->SetCollisionProfileName(TEXT("ItemMesh"));
 
-	Trigger->bIgnoreRadialImpulse = true;
-	Trigger->bIgnoreRadialForce = true;
-	Trigger->SetCanEverAffectNavigation(false);
-	Trigger->SetSimulatePhysics(true);
-	Trigger->BodyInstance.bLockXRotation = true;
-	Trigger->BodyInstance.bLockYRotation = true;
-	Trigger->BodyInstance.bLockZRotation = true;
+	Item->bIgnoreRadialImpulse = true;
+	Item->bIgnoreRadialForce = true;
+	Item->SetCanEverAffectNavigation(false);
+	Item->SetSimulatePhysics(true);
+	Item->BodyInstance.bLockXRotation = true;
+	Item->BodyInstance.bLockYRotation = true;
+	Item->BodyInstance.bLockZRotation = true;
 }
 
 // Called when the game starts or when spawned
@@ -120,7 +121,7 @@ void APAItem::BeginPlay()
 
 	if (eItemKind != EItemKind::IKE_NONE)
 	{
-		Trigger->AddImpulse(FVector(FMath::RandRange(5.f, 10.f), FMath::RandRange(5.f, 10.f), Trigger->GetMass()), NAME_None, true);
+		Item->AddImpulse(FVector(FMath::RandRange(5.f, 10.f), FMath::RandRange(5.f, 10.f), Item->GetMass()), NAME_None, true);
 
 		auto NameWidget = Cast<UUW_ItemName>(ItemNameWidget->GetUserWidgetObject());
 		if (nullptr != NameWidget)
@@ -135,21 +136,44 @@ void APAItem::BeginPlay()
 				NameWidget->SetItemName(ItemData->itemName);
 			}
 		}
+
+		Trigger->OnComponentBeginOverlap.AddDynamic(this, &APAItem::OnPlayerOverlap);
 	}
 }
 
 void APAItem::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	//Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnCharacterOverlap);
 }
 
 void APAItem::OnPlayerOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	PALOG_S(Warning); // temporary, 확인용
+
+	auto PACharacter = Cast<APACharacter>(OtherActor);
+	PACHECK(nullptr != PACharacter);
+
+	if (PACharacter->IsPlayerControlled() == false)
+	{
+		return;
+	}
 
 
+	auto PAPlayerController = Cast<APAPlayerController>(PACharacter->GetController());
+	PACHECK(nullptr != PAPlayerController);
+
+	if (eItemKind != EItemKind::IKE_NONE)
+	{
+		ItemNameWidget->RemoveFromRoot();
+		ItemNameWidget->DestroyComponent();
+		Item->SetHiddenInGame(true, true);
+		SetActorEnableCollision(false);
+		Trigger->SetCollisionProfileName(TEXT("NoCollision"));
+		Item->SetCollisionProfileName(TEXT("NoCollision"));
+		PAPlayerController->AddItem(this);
+	}
+	
 }
 
 

@@ -18,6 +18,7 @@ APAPlayerController::APAPlayerController()
 	MoveCompletedVector = FVector(0.f, 0.f, -1.f);
 	bMoving = false;
 	bInputPressed = false;
+	shilling = 0;
 
 	bInventoryOpened = false;
 	static ConstructorHelpers::FClassFinder<UUserWidget> UI_INVENTORY(TEXT("/Game/ProjectArkContents/UI/WB_Inventory.WB_Inventory_C"));
@@ -29,7 +30,6 @@ APAPlayerController::APAPlayerController()
 	PACHECK(nullptr != UI_InventoryClass);
 
 	InventoryWidget = Cast<UUserWidget>(CreateWidget(GetWorld(), UI_InventoryClass));
-
 }
 
 void APAPlayerController::PlayerTick(float DeltaTime)
@@ -128,3 +128,19 @@ void APAPlayerController::OnCallInventory()
 		bInventoryOpened = true;
 	}
 }
+
+void APAPlayerController::AddItem(APAItem* NewItem)
+{
+	PACHECK(nullptr!=NewItem)
+
+	if (NewItem->eItemKind == EItemKind::IKE_SHILLING)
+	{
+		shilling += NewItem->amount;
+		PALOG(Warning, TEXT("Shillings: %d"), shilling);
+	}
+	else
+	{
+		InvenArray.Emplace(NewItem);
+	}
+}
+
