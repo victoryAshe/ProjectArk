@@ -30,34 +30,12 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, ControllingPawn);
 
-	
-	// HomePos에서의 거리 계산
-	FVector HomePos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(AMonsterAIController::HomePosKey);
-	float DistanceFromHome = FVector::Dist(Center, HomePos);
-	PALOG(Warning, TEXT("Distance from Home: %f"), DistanceFromHome);
-
-	if (DistanceFromHome > 2000.0f)
-	{
-		PALOG(Error, TEXT("DistanceFromHome > 2000.0f"));
-		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), true);
-		PALOG(Error, TEXT("bShouldReturnHome is true"));
-		return;
-	}
-	/*
-	else if (DistanceFromHome < 1.0f)
-	{
-		PALOG(Error, TEXT("DistanceFromHome < 1.0f"));
-		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), false);
-		PALOG(Error, TEXT("bShouldReturnHome is false"));
-	}
-	*/
-
 	// 주변 충돌체 검출 
 	bool bResult = World->OverlapMultiByChannel(
 		OverlapResults,                             // 탐색된 모든 객체를 담는 TArray
 		Center,                                     // 전체 위치에서 탐색 시작
 		FQuat::Identity,                            // 충돌 검사 수행 전, 충돌 형상에 적용할 회전으로, 충돌 검사에 회전을 적용하지 않음
-		ECollisionChannel::ECC_GameTraceChannel2,   // 충돌 검사에 사용할 트레이스 채널 선택
+		ECollisionChannel::ECC_GameTraceChannel3,   // 충돌 검사에 사용할 트레이스 채널 선택
 		FCollisionShape::MakeSphere(DetectRadius),  // 충돌 모양 및 범위
 		CollisionQueryParam                         // 단순 충돌 모양만 고려 
 	);
@@ -96,4 +74,25 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	// OwnerComp.GetBlackboardComponent()->SetValueAsObject(AMonsterAIController::TargetKey, nullptr);
 
 	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);                  // 감지 안 되면 빨간색으로 표시
+
+	// HomePos에서의 거리 계산
+	FVector HomePos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(AMonsterAIController::HomePosKey);
+	float DistanceFromHome = FVector::Dist(Center, HomePos);
+	PALOG(Warning, TEXT("Distance from Home: %f"), DistanceFromHome);
+
+	if (DistanceFromHome > 2000.0f)
+	{
+		PALOG(Error, TEXT("DistanceFromHome > 2000.0f"), NULL);
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), true);
+		PALOG(Error, TEXT("bShouldReturnHome is true"), NULL);
+		return;
+	}
+	/*
+	else if (DistanceFromHome < 1.0f)
+	{
+		PALOG(Error, TEXT("DistanceFromHome < 1.0f"));
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), false);
+		PALOG(Error, TEXT("bShouldReturnHome is false"));
+	}
+	*/
 }
