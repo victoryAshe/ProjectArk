@@ -27,6 +27,7 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	float DetectRadius = 600.0f;                    // 감지 원의 반지름
 
 	if (nullptr == World) return;
+
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, ControllingPawn);
 
@@ -40,7 +41,19 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 		CollisionQueryParam                         // 단순 충돌 모양만 고려 
 	);
 
-	
+	// HomePos에서의 거리 계산
+	FVector HomePos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(AMonsterAIController::HomePosKey);
+	float DistanceFromHome = FVector::Dist(Center, HomePos);
+	PALOG(Warning, TEXT("Distance from Home: %f"), DistanceFromHome);
+
+	if (DistanceFromHome > 2000.0f)
+	{
+		PALOG(Error, TEXT("DistanceFromHome > 2000.0f"), NULL);
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), true);
+		PALOG(Error, TEXT("bShouldReturnHome is true"), NULL);
+		return;
+	}
+
 	// TargetKey 값 초기화
 	// 검색 전 타겟은 초기화를 해줘야 없어졌을때 패트롤 모드로 간다. 아직도 복수의 타겟 처리가 안되었다.
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AMonsterAIController::TargetKey, nullptr);
@@ -75,24 +88,4 @@ void UBTService_MonsterDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 
 	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);                  // 감지 안 되면 빨간색으로 표시
 
-	// HomePos에서의 거리 계산
-	FVector HomePos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(AMonsterAIController::HomePosKey);
-	float DistanceFromHome = FVector::Dist(Center, HomePos);
-	PALOG(Warning, TEXT("Distance from Home: %f"), DistanceFromHome);
-
-	if (DistanceFromHome > 2000.0f)
-	{
-		PALOG(Error, TEXT("DistanceFromHome > 2000.0f"), NULL);
-		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), true);
-		PALOG(Error, TEXT("bShouldReturnHome is true"), NULL);
-		return;
-	}
-	/*
-	else if (DistanceFromHome < 1.0f)
-	{
-		PALOG(Error, TEXT("DistanceFromHome < 1.0f"));
-		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldReturnHome"), false);
-		PALOG(Error, TEXT("bShouldReturnHome is false"));
-	}
-	*/
 }
